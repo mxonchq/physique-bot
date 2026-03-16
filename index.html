@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Physique</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+:root{
+  --bg:#0d0d0d;--bg2:#161616;--bg3:#1e1e1e;--bg4:#252525;
+  --border:#2a2a2a;--border2:#333;
+  --text:#f0f0f0;--text2:#999;--text3:#555;
+  --red:#e8193c;--red2:#ff2d4e;--redbg:rgba(232,25,60,0.1);--redbdr:rgba(232,25,60,0.2);
+  --green:#00c853;--greenbg:rgba(0,200,83,0.1);--greenbdr:rgba(0,200,83,0.25);
+  --blue:#2979ff;--bluebg:rgba(41,121,255,0.1);
+  --yellow:#ffab00;--yellowbg:rgba(255,171,0,0.1);
+  --r:16px;--rsm:12px;--rxs:8px;
+  --f:'Outfit',sans-serif;
+  --st:env(safe-area-inset-top,0px);
+  --sb:env(safe-area-inset-bottom,0px);
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--f);height:100%;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* HEADER */
+.hdr{padding:calc(var(--st) + 14px) 20px 0;background:var(--bg);flex-shrink:0}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.hdr-brand{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text3)}
+.hdr-date{font-size:12px;color:var(--text3);font-weight:500}
+.hdr-title{font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;margin-bottom:14px}
+
+/* TABS */
+.tabs{display:flex;padding:0 12px 10px;background:var(--bg);flex-shrink:0;gap:4px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border-radius:10px;cursor:pointer;transition:all 0.2s;color:var(--text3);background:none;border:none;font-family:var(--f)}
+.tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab span{font-size:10px;font-weight:700;letter-spacing:0.3px}
+.tab.on{color:var(--red);background:var(--redbg)}
+
+/* PAGES */
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;padding:14px 14px calc(24px + var(--sb));display:none;scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page.on{display:block;animation:fu .22s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px}
+.cp{padding:14px 16px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
+.clbl{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.cact{font-size:12px;font-weight:700;color:var(--red);cursor:pointer}
+
+/* KCAL CARD */
+.kcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
+.ktop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.knum{font-size:48px;font-weight:900;letter-spacing:-2px;line-height:1}
+.ksub{font-size:12px;color:var(--text3);margin-top:3px;font-weight:500}
+.kright{text-align:right}
+.kremain{font-size:26px;font-weight:800;letter-spacing:-1px}
+.kremainlbl{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:0.5px;margin-top:2px;text-transform:uppercase}
+.kbar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.kbarfill{height:100%;border-radius:2px;background:var(--red);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.mcrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mcbox{background:var(--bg3);border-radius:10px;padding:10px 11px}
+.mcval{font-size:17px;font-weight:800;letter-spacing:-.5px}
+.mclbl{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-top:1px}
+.mcbar{height:3px;border-radius:2px;margin-top:5px;background:var(--bg4);overflow:hidden}
+.mcfill{height:100%;border-radius:2px;transition:width .5s}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px}
+.sico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.sico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.snum{font-size:20px;font-weight:800;letter-spacing:-.5px;line-height:1}
+.slbl{font-size:10px;color:var(--text3);font-weight:600;margin-top:2px;letter-spacing:.3px}
+.ssub{font-size:11px;font-weight:600;margin-top:3px}
+
+/* TOGGLE */
+.tgcard{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.tgcard.on{background:var(--greenbg);border-color:var(--greenbdr)}
+.tgico{width:38px;height:38px;border-radius:11px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tgico svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tginfo{flex:1}
+.tgname{font-size:14px;font-weight:700}
+.tgsub{font-size:11px;color:var(--text3);margin-top:1px}
+.sw{width:42px;height:23px;border-radius:12px;background:var(--bg4);position:relative;transition:background .2s;flex-shrink:0}
+.sw.on{background:var(--green)}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw.on::after{left:22px}
+
+/* WATER QUICK */
+.wbtns{display:flex;gap:6px;flex-wrap:wrap}
+.wbtn{flex:1;min-width:55px;padding:9px 6px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
+.wbtn:active{background:var(--bluebg);border-color:var(--blue);color:var(--blue)}
+
+/* INPUT */
+.irow{display:flex;gap:8px}
+.inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:var(--f);font-size:14px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--red)}
+.inp::placeholder{color:var(--text3)}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:10px;border:none;cursor:pointer;font-family:var(--f);font-size:14px;font-weight:700;transition:all .15s;width:100%}
+.btn:active{transform:scale(.97)}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn-r{background:var(--red);color:white}
+.btn-g{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-sm{padding:10px 15px;font-size:13px;width:auto;border-radius:9px}
+
+/* FOOD */
+.sw-inp{position:relative;margin-bottom:12px}
+.sw-inp svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.srch{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 13px 11px 37px;color:var(--text);font-family:var(--f);font-size:14px;outline:none;transition:border-color .2s}
+.srch:focus{border-color:var(--red)}
+.srch::placeholder{color:var(--text3)}
+.sechead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;margin-top:2px}
+.seclbl{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.secact{font-size:12px;font-weight:700;color:var(--red);cursor:pointer}
+.cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.cats::-webkit-scrollbar{display:none}
+.cat{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text3);transition:all .15s}
+.cat.on{background:var(--redbg);border-color:var(--redbdr);color:var(--red)}
+.flist{display:flex;flex-direction:column;gap:5px}
+.fitem{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s}
+.fitem:active{background:var(--bg3)}
+.fico{width:36px;height:36px;border-radius:9px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.finfo{flex:1;min-width:0}
+.fname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fmacro{font-size:11px;color:var(--text3);margin-top:1px}
+.fkcal{font-size:14px;font-weight:800;flex-shrink:0;color:var(--text2)}
+.fadd{width:26px;height:26px;border-radius:7px;background:var(--redbg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fadd svg{width:13px;height:13px;stroke:var(--red);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.litem{display:flex;align-items:center;gap:9px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:5px}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0}
+.linfo{flex:1;min-width:0}
+.lname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lsub{font-size:10px;color:var(--text3);margin-top:1px}
+.lkcal{font-size:13px;font-weight:800;flex-shrink:0}
+.ldel{padding:5px;cursor:pointer;color:var(--text3)}
+.ldel svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* WORKOUT */
+.wscroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}
+.wscroll::-webkit-scrollbar{display:none}
+.wday{flex-shrink:0;width:48px;padding:9px 4px;border-radius:11px;background:var(--bg2);border:1px solid var(--border);text-align:center;cursor:pointer;transition:all .2s}
+.wday.active{background:var(--red);border-color:var(--red)}
+.wday.done{background:var(--greenbg);border-color:var(--greenbdr)}
+.wdname{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
+.wdico{font-size:14px;margin-top:3px}
+.wday.active .wdname,.wday.active .wdico-t{color:white}
+.wbanner{background:var(--red);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;position:relative;overflow:hidden}
+.wbanner::before{content:'';position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.07)}
+.wbtype{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.75;margin-bottom:3px}
+.wbname{font-size:24px;font-weight:900;letter-spacing:-.5px}
+.wbsub{font-size:12px;opacity:.7;margin-top:3px}
+.exitem{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-bottom:7px;cursor:pointer;transition:all .2s}
+.exitem.done{border-color:var(--greenbdr);background:var(--greenbg)}
+.exnum{width:28px;height:28px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:all .2s}
+.exitem.done .exnum{background:var(--green);color:#000}
+.exbody{flex:1}
+.exname{font-size:13px;font-weight:700}
+.exsets{font-size:11px;color:var(--text3);margin-top:1px}
+.exck svg{width:18px;height:18px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:all .2s}
+.exitem.done .exck svg{stroke:var(--green)}
+
+/* WATER PAGE */
+.whero{text-align:center;padding:20px 0 16px}
+.wbignum{font-size:64px;font-weight:900;letter-spacing:-3px;line-height:1;color:var(--blue)}
+.wunit{font-size:14px;color:var(--text3);font-weight:600;margin-top:3px}
+.wpbar{height:5px;background:var(--bg3);border-radius:3px;margin:14px 0 0;overflow:hidden}
+.wpfill{height:100%;border-radius:3px;background:var(--blue);transition:width .5s}
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wtile{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:13px 8px;text-align:center;cursor:pointer;transition:all .15s}
+.wtile:active{background:var(--bluebg);border-color:var(--blue)}
+.wtile svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:5px}
+.wtval{font-size:15px;font-weight:800}
+.wtlbl{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* PROGRESS */
+.pgmet{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.pgmhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.pgmlbl{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.pgbadge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px}
+.pgbadge.g{background:var(--greenbg);color:var(--green)}
+.pgbadge.b{background:var(--redbg);color:var(--red)}
+.pgbadge.n{background:var(--bg3);color:var(--text3)}
+.pgnum{font-size:38px;font-weight:900;letter-spacing:-1.5px;line-height:1}
+.pgunit{font-size:12px;color:var(--text3);margin-top:2px}
+.chart{display:flex;gap:3px;align-items:flex-end;height:40px;margin-top:12px}
+.cb{flex:1;border-radius:3px 3px 0 0;background:var(--bg3);min-height:3px;transition:height .4s}
+.cb.ct{background:var(--red)}
+.cb.cf{background:var(--bg4)}
+.strk{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.snum{font-size:44px;font-weight:900;letter-spacing:-2px;color:var(--yellow)}
+.stitle{font-size:14px;font-weight:800}
+.ssb{font-size:11px;color:var(--text3);margin-top:2px}
+.strk7{display:flex;gap:4px;margin-bottom:10px}
+.s7d{flex:1;aspect-ratio:1;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--text3)}
+.s7d.don{background:var(--greenbg);color:var(--green);border:1px solid var(--greenbdr)}
+.s7d.tod{border:1px solid var(--red);color:var(--red)}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(6px)}
+.ov.open{opacity:1;pointer-events:all}
+.sheet{background:var(--bg2);border-radius:20px 20px 0 0;padding:18px 18px calc(18px + var(--sb));width:100%;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,0,.67,0);max-height:88vh;overflow-y:auto}
+.ov.open .sheet{transform:translateY(0)}
+.handle{width:30px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto 14px}
+.stitle{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:3px}
+.ssub2{font-size:12px;color:var(--text3);margin-bottom:14px}
+.ptrow{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 12px}
+.pchip{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;background:var(--bg3);border:1px solid var(--border);color:var(--text);cursor:pointer}
+.pchip.sel{background:var(--redbg);border-color:var(--redbdr);color:var(--red)}
+.preview{background:var(--bg3);border-radius:9px;padding:11px 13px;margin:8px 0 12px;font-size:12px;color:var(--text3)}
+.preview b{color:var(--text);font-size:14px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fgfull{grid-column:1/-1}
+.fglbl{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(70px + var(--sb));left:50%;transform:translateX(-50%) translateY(8px);background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:9px 18px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:22px;color:var(--text3);font-size:13px;font-weight:500}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="hdr">
+  <div class="hdr-row"><div class="hdr-brand">Physique</div><div class="hdr-date" id="hdate"></div></div>
+  <div class="hdr-title" id="htitle"></div>
+</div>
+<div class="tabs">
+  <button class="tab on" onclick="go('dash')" id="t-dash">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>День</span></button>
+  <button class="tab" onclick="go('food')" id="t-food">
+    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+    <span>Еда</span></button>
+  <button class="tab" onclick="go('work')" id="t-work">
+    <svg viewBox="0 0 24 24"><path d="M6.5 6.5h11M6.5 17.5h11M4 8.5v7M20 8.5v7M2 10v4M22 10v4"/></svg>
+    <span>Трен</span></button>
+  <button class="tab" onclick="go('watr')" id="t-watr">
+    <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+    <span>Вода</span></button>
+  <button class="tab" onclick="go('prog')" id="t-prog">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Прогресс</span></button>
+</div>
+<div class="pages">
+
+<!-- DASHBOARD -->
+<div class="page on" id="p-dash">
+  <div class="kcard">
+    <div class="ktop">
+      <div><div class="knum" id="dk">0</div><div class="ksub">из <span id="dkt">2300</span> ккал</div></div>
+      <div class="kright"><div class="kremain" id="drem">2300</div><div class="kremainlbl">осталось</div></div>
+    </div>
+    <div class="kbar"><div class="kbarfill" id="dkb" style="width:0%"></div></div>
+    <div class="mcrow">
+      <div class="mcbox"><div class="mcval" id="dp">0<span style="font-size:11px;color:var(--text3)">г</span></div><div class="mclbl">Белок</div><div class="mcbar"><div class="mcfill" id="dpb" style="width:0%;background:#2979ff"></div></div></div>
+      <div class="mcbox"><div class="mcval" id="dc">0<span style="font-size:11px;color:var(--text3)">г</span></div><div class="mclbl">Углеводы</div><div class="mcbar"><div class="mcfill" id="dcb" style="width:0%;background:#ffab00"></div></div></div>
+      <div class="mcbox"><div class="mcval" id="df">0<span style="font-size:11px;color:var(--text3)">г</span></div><div class="mclbl">Жиры</div><div class="mcbar"><div class="mcfill" id="dfb" style="width:0%;background:#ff6d00"></div></div></div>
+    </div>
+  </div>
+  <div class="sgrid">
+    <div class="scard">
+      <div class="sico" style="background:var(--bluebg);color:var(--blue)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+      <div class="snum" id="dwn">0.0</div><div class="slbl">Литров воды</div>
+      <div class="ssub" id="dws" style="color:var(--text3)">цель 3.0 л</div>
+    </div>
+    <div class="scard">
+      <div class="sico" style="background:var(--yellowbg);color:var(--yellow)"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div class="snum" id="dsn">0</div><div class="slbl">Шагов</div>
+      <div class="ssub" id="dss" style="color:var(--text3)">цель 6 000</div>
+    </div>
+    <div class="scard">
+      <div class="sico" style="background:var(--redbg);color:var(--red)"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      <div class="snum" id="dwgt">—</div><div class="slbl">Кг</div>
+      <div class="ssub" id="dwgts" style="color:var(--text3)">старт 104.3</div>
+    </div>
+    <div class="scard" onclick="go('prog')" style="cursor:pointer">
+      <div class="sico" style="background:var(--yellowbg);color:var(--yellow)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div class="snum" id="dstrk">0</div><div class="slbl">Дней серия</div>
+      <div class="ssub" style="color:var(--yellow)">🔥 стрик</div>
+    </div>
+  </div>
+  <div class="tgcard" id="ccard" onclick="togCr()">
+    <div class="tgico" style="color:var(--text2)"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path d="M3 13h18"/><path d="M8 21l4-8 4 8"/></svg></div>
+    <div class="tginfo"><div class="tgname">Креатин 5–6г</div><div class="tgsub" id="csub">Не принят</div></div>
+    <div class="sw" id="csw"></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="clbl">Серия дней</div><div style="font-size:12px;color:var(--yellow)">🔥 7 дней</div></div>
+    <div class="strk7 cp" style="padding-top:0" id="s7row"></div>
+  </div>
+  <div class="card cp"><div class="clbl" style="margin-bottom:9px">Быстро добавить воду</div>
+    <div class="wbtns">
+      <button class="wbtn" onclick="addW(.2)">200мл</button>
+      <button class="wbtn" onclick="addW(.3)">300мл</button>
+      <button class="wbtn" onclick="addW(.5)">500мл</button>
+      <button class="wbtn" onclick="addW(.75)">750мл</button>
+      <button class="wbtn" onclick="addW(1)">1л</button>
+    </div>
+  </div>
+  <div class="card cp"><div class="clbl" style="margin-bottom:9px">Записать вес</div>
+    <div class="irow"><input class="inp" id="winp" type="number" step=".1" placeholder="103.5"><button class="btn btn-r btn-sm" onclick="savW()">Сохранить</button></div>
+  </div>
+  <div class="card cp"><div class="clbl" style="margin-bottom:9px">Шаги за день</div>
+    <div class="irow"><input class="inp" id="sinp" type="number" placeholder="6000"><button class="btn btn-r btn-sm" onclick="savS()">OK</button></div>
+  </div>
+</div>
+
+<!-- FOOD -->
+<div class="page" id="p-food">
+  <div class="sw-inp"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="srch" id="fsrch" placeholder="Поиск продукта..." oninput="filt(this.value)"></div>
+  <div id="logwrap">
+    <div class="sechead"><div class="seclbl">Съедено сегодня</div><div id="logtot" style="font-size:11px;color:var(--text3)"></div></div>
+    <div id="loglist"></div>
+  </div>
+  <div class="sechead" style="margin-top:14px"><div class="seclbl">Добавить</div><div class="secact" onclick="openCF()">+ Своё блюдо</div></div>
+  <div class="cats" id="catrow"></div>
+  <div class="flist" id="flist"></div>
+</div>
+
+<!-- WORKOUT -->
+<div class="page" id="p-work">
+  <div class="wscroll" id="wscroll"></div>
+  <div class="wbanner" id="wbanner">
+    <div class="wbtype" id="wbtype">СЕГОДНЯ</div>
+    <div class="wbname" id="wbname">—</div>
+    <div class="wbsub" id="wbsub"></div>
+  </div>
+  <div id="exlist"></div>
+  <button class="btn btn-g" style="margin-top:4px" onclick="markDone()">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    Отметить выполненной
+  </button>
+</div>
+
+<!-- WATER -->
+<div class="page" id="p-watr">
+  <div class="card">
+    <div class="whero">
+      <div class="wbignum" id="wbig">0.0</div>
+      <div class="wunit">из 3.0 литров</div>
+      <div class="wpbar"><div class="wpfill" id="wpb" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="card cp"><div class="clbl" style="margin-bottom:10px">Добавить</div>
+    <div class="wgrid">
+      <div class="wtile" onclick="addW(.15)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div class="wtval">150</div><div class="wtlbl">мл</div></div>
+      <div class="wtile" onclick="addW(.2)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div class="wtval">200</div><div class="wtlbl">мл</div></div>
+      <div class="wtile" onclick="addW(.25)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div class="wtval">250</div><div class="wtlbl">мл</div></div>
+      <div class="wtile" onclick="addW(.33)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div class="wtval">330</div><div class="wtlbl">мл</div></div>
+      <div class="wtile" onclick="addW(.5)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div class="wtval">500</div><div class="wtlbl">мл</div></div>
+      <div class="wtile" onclick="addW(1)"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div class="wtval">1000</div><div class="wtlbl">мл</div></div>
+    </div>
+  </div>
+  <div class="card cp"><div class="clbl" style="margin-bottom:9px">Своё количество</div>
+    <div class="irow"><input class="inp" id="cwi" type="number" placeholder="250 мл"><button class="btn btn-r btn-sm" onclick="addCW()">+</button></div>
+  </div>
+  <button class="btn btn-g" onclick="resetW()" style="margin-top:4px">Сбросить на 0</button>
+</div>
+
+<!-- PROGRESS -->
+<div class="page" id="p-prog">
+  <div class="strk">
+    <div class="snum" id="pgstrk">0</div>
+    <div><div class="stitle">🔥 Серия дней</div><div class="ssb">дней подряд с данными</div></div>
+  </div>
+  <div class="strk7" id="pg7row"></div>
+  <div class="pgmet">
+    <div class="pgmhead"><div class="pgmlbl">⚖️ Вес</div><div class="pgbadge n" id="pwbadge">—</div></div>
+    <div class="pgnum" id="pgw">—</div><div class="pgunit">кг · старт 104.3</div>
+    <div class="chart" id="pgwchart" style="margin-bottom:12px"></div>
+    <div class="irow"><input class="inp" id="pgwi" type="number" step=".1" placeholder="103.0" style="flex:1"><button class="btn btn-r btn-sm" onclick="savPgW()">+ Добавить</button></div>
+  </div>
+  <div class="pgmet">
+    <div class="pgmhead"><div class="pgmlbl">📏 Талия</div><div class="pgbadge n" id="pwaistb">—</div></div>
+    <div class="pgnum" id="pgwaist">—</div><div class="pgunit">см · старт 104</div>
+    <div class="irow" style="margin-top:12px"><input class="inp" id="pgwaisinp" type="number" step=".1" placeholder="102.0" style="flex:1"><button class="btn btn-r btn-sm" onclick="savWaist()">+ Добавить</button></div>
+  </div>
+  <div class="pgmet">
+    <div class="pgmhead"><div class="pgmlbl">🍽 Среднее за 7 дней</div></div>
+    <div class="pgnum" id="pgavg">—</div><div class="pgunit">ккал / день</div>
+  </div>
+  <div class="pgmet">
+    <div class="pgmlbl" style="margin-bottom:10px">💪 Тренировки</div>
+    <div id="pgwrk" style="color:var(--text3);font-size:13px">Нет записей</div>
+  </div>
+</div>
+
+</div><!-- /pages -->
+</div><!-- /app -->
+
+<!-- FOOD MODAL -->
+<div class="ov" id="fmod" onclick="clov(event,'fmod')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="stitle" id="fmtit">Продукт</div>
+    <div class="ssub2" id="fmmac"></div>
+    <div class="fglbl" style="margin-bottom:5px">Количество (граммы)</div>
+    <input class="inp" id="fmg" type="number" style="margin-bottom:8px;width:100%" oninput="updCalc()">
+    <div class="ptrow" id="ptrow"></div>
+    <div class="preview" id="fmcalc">Введи граммы</div>
+    <button class="btn btn-r" onclick="confFood()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Добавить в дневник</button>
+  </div>
+</div>
+
+<!-- CUSTOM FOOD MODAL -->
+<div class="ov" id="cfmod" onclick="clov(event,'cfmod')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="stitle">Своё блюдо</div>
+    <div class="ssub2">Данные с упаковки на 100г</div>
+    <div class="fgrid">
+      <div class="fg fgfull"><div class="fglbl">Название</div><input class="inp" id="cfn" placeholder="Гречка с курицей"></div>
+      <div class="fg"><div class="fglbl">Калории</div><input class="inp" id="cfk" type="number" placeholder="150"></div>
+      <div class="fg"><div class="fglbl">Белок г</div><input class="inp" id="cfp" type="number" placeholder="12"></div>
+      <div class="fg"><div class="fglbl">Жиры г</div><input class="inp" id="cff" type="number" placeholder="5"></div>
+      <div class="fg"><div class="fglbl">Углеводы г</div><input class="inp" id="cfc" type="number" placeholder="20"></div>
+      <div class="fg"><div class="fglbl">Съел (г)</div><input class="inp" id="cfg" type="number" placeholder="200"></div>
+    </div>
+    <button class="btn btn-r" onclick="savCF()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Добавить</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor('#0d0d0d');tg.setBackgroundColor&&tg.setBackgroundColor('#0d0d0d')}
+
+const TODAY=new Date().toISOString().slice(0,10);
+const WDAY=(new Date().getDay()+6)%7;
+const SCH={0:'strength',1:'strength',2:'cardio',3:'strength',4:'strength',5:'cardio',6:'flex'};
+const TGT={strength:{k:2300,p:200,f:65,c:235,w:3,s:6000},cardio:{k:2100,p:200,f:70,c:190,w:3,s:6000},flex:{k:2500,p:200,f:70,c:260,w:3,s:7000}};
+const DR=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const DI=['💪','🦵','🏃','💪','🦵','🏃','😴'];
+const WN=['Верх А','Низ А','Кардио','Верх Б','Низ Б','Кардио','Отдых'];
+const WT=['Силовая','Силовая','Кардио','Силовая','Силовая','Кардио','Флекс'];
+const WK={
+  0:[{n:'Жим штанги с пола',s:'4 подхода',r:'6–10 повт'},{n:'Тяга штанги в наклоне',s:'4 подхода',r:'8–12 повт'},{n:'Жим штанги стоя',s:'3 подхода',r:'6–10 повт'},{n:'Отжимания на упорах',s:'3 подхода',r:'до отказа'},{n:'Сгибание рук EZ-гриф',s:'3 подхода',r:'8–12 повт'},{n:'Французский жим',s:'3 подхода',r:'10–15 повт'},{n:'Подъёмы в стороны',s:'2–3 подхода',r:'12–20 повт'}],
+  1:[{n:'Зерчер-присед',s:'4 подхода',r:'6–10 повт'},{n:'Румынская тяга',s:'4 подхода',r:'8–12 повт'},{n:'Болгарские выпады',s:'3 подхода',r:'8–12 на ногу'},{n:'Ягодичный мост со штангой',s:'3 подхода',r:'10–15 повт'},{n:'Подъёмы на икры',s:'4 подхода',r:'12–20 повт'},{n:'Планка',s:'3 подхода',r:'30–60 сек'},{n:'Обратные скручивания',s:'3 подхода',r:'12–20 повт'}],
+  2:[{n:'Дорожка — быстрая ходьба/бег',s:'1 подход',r:'35–45 мин'},{n:'Интервалы: 3мин бег / 2мин ходьба × 6',s:'1 подход',r:'30 мин'}],
+  3:[{n:'Отжимания с рюкзаком',s:'4 подхода',r:'8–15 повт'},{n:'Тяга штанги (тяжёлая)',s:'4 подхода',r:'6–10 повт'},{n:'Жим с пола с паузой',s:'3 подхода',r:'8–12 повт'},{n:'Жим стоя (лёгкий)',s:'3 подхода',r:'8–12 повт'},{n:'Пуловер',s:'3 подхода',r:'10–15 повт'},{n:'Сгибание рук EZ',s:'3 подхода',r:'10–15 повт'},{n:'Трицепс над головой',s:'3 подхода',r:'10–15 повт'},{n:'Задняя дельта',s:'2–3 подхода',r:'12–20 повт'}],
+  4:[{n:'Тяга классическая',s:'4 подхода',r:'5–8 повт'},{n:'Зерчер-присед (средний)',s:'3 подхода',r:'10–12 повт'},{n:'Выпады назад',s:'3 подхода',r:'8–12 на ногу'},{n:'Good morning',s:'3 подхода',r:'10–15 повт'},{n:'Одноногий ягодичный мост',s:'2–3 подхода',r:'12–15 на ногу'},{n:'Скручивания с блином',s:'3 подхода',r:'12–20 повт'},{n:'Боковая планка',s:'3 подхода',r:'30–45 сек'}],
+  5:[{n:'Дорожка или прогулка',s:'1 подход',r:'40–60 мин'}],
+};
+
+const CATS=['Все','Мясо','Молочка','Крупы','Овощи','Фрукты','Протеин','Снеки','Готовые блюда'];
+const FDB=[
+  {cat:'Мясо',i:'🍗',n:'Курица грудка (сырая)',k:112,p:23,f:2,c:0},
+  {cat:'Мясо',i:'🍗',n:'Курица бедро (сырое)',k:172,p:18,f:11,c:0},
+  {cat:'Мясо',i:'🥩',n:'Фарш индейки',k:112,p:19,f:4,c:0},
+  {cat:'Мясо',i:'🥩',n:'Куриная котлета (жареная)',k:220,p:17,f:15,c:2},
+  {cat:'Мясо',i:'🥩',n:'Шашлык из курицы',k:135,p:20,f:6,c:0},
+  {cat:'Мясо',i:'🥚',n:'Яйцо варёное',k:155,p:12.5,f:10.5,c:0.7,dg:60},
+  {cat:'Мясо',i:'🥚',n:'Яйцо жареное',k:196,p:13,f:15,c:1,dg:60},
+  {cat:'Молочка',i:'🧀',n:'Творог 2%',k:101,p:18,f:2,c:3},
+  {cat:'Молочка',i:'🧀',n:'Творог 5%',k:120,p:17,f:5,c:3},
+  {cat:'Молочка',i:'🥛',n:'Йогурт греческий 2%',k:66,p:11,f:2,c:4},
+  {cat:'Молочка',i:'🥛',n:'Кефир 1%',k:40,p:4,f:1,c:5},
+  {cat:'Молочка',i:'🥛',n:'Молоко 2.5%',k:52,p:2.9,f:2.5,c:4.7},
+  {cat:'Молочка',i:'🧀',n:'Сыр твёрдый',k:370,p:25,f:30,c:0},
+  {cat:'Молочка',i:'🧀',n:'Сыр плавленый',k:295,p:7,f:28,c:0},
+  {cat:'Молочка',i:'🥣',n:'Сметана 15%',k:160,p:2.8,f:15,c:3.2},
+  {cat:'Молочка',i:'🥣',n:'Сырники домашние',k:195,p:14,f:7,c:20},
+  {cat:'Крупы',i:'🍝',n:'Макароны сухие',k:350,p:13,f:1,c:70},
+  {cat:'Крупы',i:'🍝',n:'Макароны варёные',k:158,p:6,f:1,c:31},
+  {cat:'Крупы',i:'🍚',n:'Рис белый сухой',k:350,p:7,f:1,c:78},
+  {cat:'Крупы',i:'🍚',n:'Рис варёный',k:130,p:2.7,f:0.3,c:28},
+  {cat:'Крупы',i:'🌾',n:'Гречка сухая',k:353,p:13,f:3,c:70},
+  {cat:'Крупы',i:'🌾',n:'Гречка варёная',k:132,p:4.5,f:1,c:25},
+  {cat:'Крупы',i:'🌾',n:'Овсянка сухая',k:372,p:13,f:7,c:65},
+  {cat:'Крупы',i:'🥔',n:'Картошка сырая',k:77,p:2,f:0.1,c:17},
+  {cat:'Крупы',i:'🥔',n:'Картошка варёная',k:82,p:2,f:0.1,c:18},
+  {cat:'Крупы',i:'🥔',n:'Картошка запечённая',k:93,p:2.5,f:0.1,c:21},
+  {cat:'Крупы',i:'🥔',n:'Картофельное пюре',k:95,p:2,f:3,c:15},
+  {cat:'Крупы',i:'🍞',n:'Хлеб белый',k:265,p:8,f:3,c:52},
+  {cat:'Крупы',i:'🌯',n:'Тортилья пшеничная',k:300,p:6,f:8,c:50,dg:50},
+  {cat:'Овощи',i:'🍅',n:'Помидор',k:18,p:0.9,f:0.2,c:3.9},
+  {cat:'Овощи',i:'🥒',n:'Огурец',k:15,p:0.7,f:0.1,c:3.1},
+  {cat:'Овощи',i:'🫑',n:'Перец болгарский',k:31,p:1,f:0.3,c:6},
+  {cat:'Овощи',i:'🧅',n:'Лук репчатый',k:41,p:1.4,f:0.2,c:8.2},
+  {cat:'Овощи',i:'🥕',n:'Морковь',k:35,p:0.9,f:0.1,c:7.5},
+  {cat:'Овощи',i:'🥦',n:'Брокколи',k:34,p:2.8,f:0.4,c:5},
+  {cat:'Овощи',i:'🌽',n:'Кукуруза консервированная',k:85,p:3,f:1,c:17},
+  {cat:'Овощи',i:'🥗',n:'Салат листовой',k:15,p:1.3,f:0.2,c:2.3},
+  {cat:'Фрукты',i:'🍌',n:'Банан',k:89,p:1.1,f:0.3,c:23,dg:120},
+  {cat:'Фрукты',i:'🍎',n:'Яблоко',k:52,p:0.3,f:0.2,c:14,dg:180},
+  {cat:'Фрукты',i:'🍊',n:'Апельсин',k:47,p:0.9,f:0.1,c:12,dg:150},
+  {cat:'Фрукты',i:'🍇',n:'Виноград',k:67,p:0.6,f:0.4,c:17},
+  {cat:'Фрукты',i:'🍓',n:'Клубника',k:33,p:0.7,f:0.3,c:8},
+  {cat:'Фрукты',i:'🫐',n:'Черника',k:57,p:0.7,f:0.3,c:14},
+  {cat:'Фрукты',i:'🥝',n:'Киви',k:61,p:1.1,f:0.5,c:15,dg:90},
+  {cat:'Фрукты',i:'🍉',n:'Арбуз',k:30,p:0.6,f:0.2,c:8},
+  {cat:'Протеин',i:'🥤',n:'Протеин Allnutrition Whey',k:403,p:70,f:6.6,c:16,dg:30},
+  {cat:'Протеин',i:'🥤',n:'Just Whey GymBeam',k:348,p:66.7,f:5.2,c:6.7,dg:33},
+  {cat:'Снеки',i:'🍫',n:'Шоколад тёмный',k:550,p:6,f:35,c:55},
+  {cat:'Снеки',i:'🍪',n:'Печенье',k:480,p:6,f:20,c:70},
+  {cat:'Снеки',i:'🌰',n:'Грецкий орех',k:654,p:15,f:65,c:14},
+  {cat:'Снеки',i:'🥜',n:'Арахис',k:567,p:26,f:49,c:16},
+  {cat:'Снеки',i:'🌻',n:'Семечки подсолнечника',k:578,p:21,f:53,c:10},
+  {cat:'Снеки',i:'🍩',n:'Пончик',k:380,p:4,f:20,c:48},
+  {cat:'Готовые блюда',i:'🍕',n:'Пицца (1 кусок)',k:266,p:11,f:10,c:34,dg:100},
+  {cat:'Готовые блюда',i:'🌯',n:'Шаурма с курицей',k:220,p:14,f:10,c:22,dg:300},
+  {cat:'Готовые блюда',i:'🍔',n:'Бургер',k:260,p:14,f:13,c:24,dg:200},
+  {cat:'Готовые блюда',i:'🥗',n:'Салат Цезарь с курицей',k:180,p:9,f:13,c:9},
+  {cat:'Готовые блюда',i:'🍜',n:'Плов с курицей',k:210,p:9,f:8,c:27},
+  {cat:'Готовые блюда',i:'🥟',n:'Вареники с картошкой',k:75,p:2.5,f:1.5,c:14,dg:40},
+  {cat:'Готовые блюда',i:'🥟',n:'Пельмени',k:165,p:9,f:6,c:19,dg:100},
+  {cat:'Готовые блюда',i:'🥞',n:'Блин',k:165,p:4,f:6,c:25,dg:70},
+  {cat:'Готовые блюда',i:'🥘',n:'Гречка с мясом',k:138,p:10,f:4,c:17},
+  {cat:'Готовые блюда',i:'🍲',n:'Курица с картошкой запечённая',k:130,p:13,f:4,c:11},
+  {cat:'Готовые блюда',i:'🥙',n:'Лапша с мясом и овощами',k:135,p:8,f:5,c:17},
+];
+
+// STORAGE
+function gLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sLS(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function gDay(d=TODAY){const data=gLS('phy4',{});return data[d]||{}}
+function sDay(d=TODAY,day){const data=gLS('phy4',{});data[d]=day;sLS('phy4',data)}
+function gCF(){return gLS('phy4_cf',[])}
+function sCF(f){sLS('phy4_cf',f)}
+
+// HELPERS
+function T(){return TGT[SCH[WDAY]]||TGT.strength}
+function pct(a,b){return Math.min((a||0)/b*100,100)}
+function fmt(n){return Math.round(n||0)}
+function se(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
+function ss(id,p,v){const e=document.getElementById(id);if(e)e.style[p]=v}
+function gwday(ds){return(new Date(ds+'T12:00:00').getDay()+6)%7}
+
+function streak(){
+  const data=gLS('phy4',{});let s=0;
+  for(let i=0;i<90;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const dd=data[ds]||{};
+    if((dd.food&&dd.food.length)||dd.weight||dd.water){s++}else if(i>0)break;
+  }return s;
+}
+
+// RENDER
+function render(){
+  const day=gDay(),t=T();
+  // Header
+  const now=new Date();
+  const he=document.getElementById('hdate');
+  if(he)he.textContent=now.toLocaleDateString('ru',{day:'numeric',month:'long'});
+  const ht=document.getElementById('htitle');
+  const h=now.getHours();
+  const gr=h<12?'Доброе утро ☀️':h<18?'Добрый день 💪':'Добрый вечер 🌙';
+  if(ht)ht.innerHTML=gr;
+
+  // Food
+  const food=(day.food||[]).reduce((a,f)=>({k:a.k+f.k,p:a.p+f.p,f:a.f+f.f,c:a.c+f.c}),{k:0,p:0,f:0,c:0});
+  se('dk',fmt(food.k));se('dkt',t.k);
+  const rem=t.k-fmt(food.k);
+  const re=document.getElementById('drem');
+  if(re){re.textContent=rem;re.style.color=rem<0?'var(--red)':'var(--green)'}
+  ss('dkb','width',pct(food.k,t.k)+'%');
+  document.getElementById('dp').innerHTML=fmt(food.p)+'<span style="font-size:11px;color:var(--text3)">г</span>';
+  document.getElementById('dc').innerHTML=fmt(food.c)+'<span style="font-size:11px;color:var(--text3)">г</span>';
+  document.getElementById('df').innerHTML=fmt(food.f)+'<span style="font-size:11px;color:var(--text3)">г</span>';
+  ss('dpb','width',pct(food.p,t.p)+'%');ss('dcb','width',pct(food.c,t.c)+'%');ss('dfb','width',pct(food.f,t.f)+'%');
+
+  // Water
+  const w=day.water||0;
+  se('dwn',w.toFixed(1));se('wbig',w.toFixed(1));
+  ss('wpb','width',pct(w,t.w)+'%');
+  const ws=document.getElementById('dws');
+  if(ws){ws.textContent=w>=t.w?'✅ Цель выполнена!':'цель '+t.w+' л';ws.style.color=w>=t.w?'var(--green)':'var(--text3)'}
+
+  // Steps
+  const s=day.steps||0;
+  se('dsn',s>=1000?(s/1000).toFixed(1)+'k':s);
+  const ss2=document.getElementById('dss');
+  if(ss2){ss2.textContent=s>=t.s?'✅ Цель!':'цель '+t.s.toLocaleString('ru');ss2.style.color=s>=t.s?'var(--green)':'var(--text3)'}
+
+  // Weight
+  se('dwgt',day.weight||'—');
+  if(day.weight){const diff=(day.weight-104.3).toFixed(1);const ws2=document.getElementById('dwgts');if(ws2){ws2.textContent=(diff>0?'+':'')+diff+' кг от старта';ws2.style.color=diff<0?'var(--green)':'var(--text3)'}}
+
+  // Creatine
+  const cr=day.creatine||false;
+  const cc=document.getElementById('ccard');if(cc)cc.className='tgcard'+(cr?' on':'');
+  const csw=document.getElementById('csw');if(csw)csw.className='sw'+(cr?' on':'');
+  se('csub',cr?'✅ Принят сегодня':'Не принят сегодня');
+
+  // Streak
+  const strk=streak();
+  se('dstrk',strk);se('pgstrk',strk);
+
+  // Streak row 7 days
+  const rows=['s7row','pg7row'];
+  rows.forEach(rid=>{
+    const row=document.getElementById(rid);if(!row)return;
+    const data=gLS('phy4',{});row.innerHTML='';
+    for(let i=6;i>=0;i--){
+      const d=new Date();d.setDate(d.getDate()-i);
+      const ds=d.toISOString().slice(0,10);
+      const dd=data[ds]||{};
+      const has=(dd.food&&dd.food.length)||dd.weight||dd.water;
+      const isT=ds===TODAY;
+      const el=document.createElement('div');
+      el.className='s7d'+(has?' don':'')+(isT?' tod':'');
+      el.textContent=DR[gwday(ds)];
+      row.appendChild(el);
+    }
+  });
+
+  renderLog();renderProg();
+}
+
+function renderLog(){
+  const list=document.getElementById('loglist');if(!list)return;
+  const food=gDay().food||[];
+  if(!food.length){list.innerHTML='<div class="empty">Добавь первый продукт ниже 👇</div>';se('logtot','');return}
+  const tot=food.reduce((a,f)=>({k:a.k+f.k,p:a.p+f.p}),{k:0,p:0});
+  se('logtot',fmt(tot.k)+' ккал · Б'+fmt(tot.p)+'г');
+  list.innerHTML='';
+  food.forEach((f,i)=>{
+    const el=document.createElement('div');el.className='litem';
+    el.innerHTML=`<div class="ldot"></div><div class="linfo"><div class="lname">${f.ic||'🍽'} ${f.nm}</div><div class="lsub">Б${fmt(f.p)}г Ж${fmt(f.f)}г У${fmt(f.c)}г</div></div><div class="lkcal">${fmt(f.k)}</div><div class="ldel" onclick="rmFood(${i})"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>`;
+    list.appendChild(el);
+  });
+}
+
+let accat='Все',sq='';
+function renderFDB(){
+  const cats=document.getElementById('catrow');
+  if(cats&&!cats.childElementCount){
+    CATS.forEach(c=>{const btn=document.createElement('div');btn.className='cat'+(c==='Все'?' on':'');btn.textContent=c;btn.onclick=()=>{accat=c;document.querySelectorAll('.cat').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFL()};cats.appendChild(btn)});
+  }renderFL();
+}
+function filt(q){sq=q;renderFL()}
+function renderFL(){
+  const list=document.getElementById('flist');if(!list)return;
+  let items=[...FDB,...gCF().map(f=>({...f,custom:true}))];
+  if(sq)items=items.filter(f=>f.n.toLowerCase().includes(sq.toLowerCase()));
+  else if(accat!=='Все')items=items.filter(f=>f.cat===accat);
+  list.innerHTML='';
+  items.forEach(f=>{
+    const el=document.createElement('div');el.className='fitem';
+    el.innerHTML=`<div class="fico">${f.i||'🍽'}</div><div class="finfo"><div class="fname">${f.n}${f.custom?'<span style="font-size:9px;color:var(--red);margin-left:5px">мой</span>':''}</div><div class="fmacro">Б${f.p}г · Ж${f.f}г · У${f.c}г</div></div><div class="fkcal">${f.k}</div><div class="fadd"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>`;
+    el.onclick=()=>openFM(f);list.appendChild(el);
+  });
+  if(!items.length)list.innerHTML='<div class="empty">Ничего не найдено</div>';
+}
+
+let vwday=WDAY;
+function renderWork(){
+  const ws=document.getElementById('wscroll');
+  if(ws){ws.innerHTML='';const data=gLS('phy4',{});
+    for(let i=0;i<7;i++){const diff=i-WDAY;const dt=new Date();dt.setDate(dt.getDate()+diff);const ds=dt.toISOString().slice(0,10);const isDone=(data[ds]||{}).workoutDone;const isA=i===vwday;const btn=document.createElement('div');btn.className='wday'+(isA?' active':'')+(isDone&&!isA?' done':'');btn.innerHTML=`<div class="wdname">${DR[i]}</div><div class="wdico">${isDone?'✅':DI[i]}</div>`;const wd=i;btn.onclick=()=>{vwday=wd;renderWork()};ws.appendChild(btn);}}
+  se('wbname',WN[vwday]);se('wbtype',WT[vwday].toUpperCase());se('wbsub',DR[vwday]+(vwday===WDAY?' · Сегодня':''));
+  const el=document.getElementById('exlist');if(!el)return;
+  const exs=WK[vwday]||[];const day=gDay();const done=(day.exDone||{});
+  el.innerHTML='';
+  if(!exs.length){el.innerHTML='<div class="empty">Сегодня — день отдыха 😴</div>';return}
+  exs.forEach((ex,i)=>{const isDone=!!done[`${vwday}_${i}`];const item=document.createElement('div');item.className='exitem'+(isDone?' done':'');item.innerHTML=`<div class="exnum">${isDone?'✓':i+1}</div><div class="exbody"><div class="exname">${ex.n}</div><div class="exsets">${ex.s} · ${ex.r}</div></div><div class="exck"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>`;item.onclick=()=>togEx(vwday,i);el.appendChild(item);});
+}
+
+function renderProg(){
+  const data=gLS('phy4',{});const dates=[];
+  for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);dates.push(d.toISOString().slice(0,10))}
+  const ws=dates.map(d=>data[d]?.weight||null);const vw=ws.filter(Boolean);
+  const ch=document.getElementById('pgwchart');
+  if(ch){ch.innerHTML='';if(vw.length>1){const mn=Math.min(...vw)-.3,mx=Math.max(...vw)+.3;dates.forEach((d,i)=>{const w=ws[i];const b=document.createElement('div');b.className='cb'+(d===TODAY?' ct':w?' cf':'');b.style.height=w?((w-mn)/(mx-mn)*36+4)+'px':'3px';ch.appendChild(b);})}}
+  if(vw.length){const cur=vw[vw.length-1],diff=(cur-104.3).toFixed(1);se('pgw',cur);const b=document.getElementById('pwbadge');if(b){b.textContent=(diff>0?'+':'')+diff+' кг';b.className='pgbadge '+(diff<=0?'g':'b')}}
+  const waists=Object.entries(data).filter(([k,v])=>v.waist).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(waists.length){const cur=waists[waists.length-1][1].waist,diff=(cur-104).toFixed(1);se('pgwaist',cur);const b=document.getElementById('pwaistb');if(b){b.textContent=(diff>0?'+':'')+diff+' см';b.className='pgbadge '+(diff<=0?'g':'b')}}
+  const kcals=dates.slice(-7).map(d=>(data[d]?.food||[]).reduce((a,f)=>a+f.k,0)).filter(k=>k>0);
+  if(kcals.length)se('pgavg',fmt(kcals.reduce((a,b)=>a+b,0)/kcals.length));
+  const wh=document.getElementById('pgwrk');
+  if(wh){const entries=Object.entries(data).filter(([k,v])=>v.workoutDone).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,6);if(entries.length)wh.innerHTML=entries.map(([d])=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between"><span style="color:var(--green)">✓ ${WN[gwday(d)]}</span><span style="color:var(--text3)">${d}</span></div>`).join('')}
+}
+
+// ACTIONS
+function togCr(){const d=gDay();d.creatine=!d.creatine;sDay(TODAY,d);render();toast(d.creatine?'💊 Креатин принят!':'Отметка снята')}
+function addW(l){const d=gDay();d.water=Math.round(((d.water||0)+l)*100)/100;sDay(TODAY,d);render();toast('💧 +'+(l*1000)+'мл · итого '+d.water.toFixed(1)+'л')}
+function addCW(){const v=parseFloat(document.getElementById('cwi').value);if(!v)return;addW(v/1000);document.getElementById('cwi').value=''}
+function resetW(){if(!confirm('Сбросить воду?'))return;const d=gDay();d.water=0;sDay(TODAY,d);render()}
+function savW(){const v=parseFloat(document.getElementById('winp').value);if(!v)return;const d=gDay();d.weight=v;sDay(TODAY,d);document.getElementById('winp').value='';render();toast('✅ Вес '+v+' кг')}
+function savPgW(){const v=parseFloat(document.getElementById('pgwi').value);if(!v)return;const d=gDay();d.weight=v;sDay(TODAY,d);document.getElementById('pgwi').value='';render();toast('✅ Вес '+v+' кг')}
+function savS(){const v=parseInt(document.getElementById('sinp').value);if(!v)return;const d=gDay();d.steps=v;sDay(TODAY,d);document.getElementById('sinp').value='';render();toast('👟 '+v.toLocaleString('ru')+' шагов')}
+function savWaist(){const v=parseFloat(document.getElementById('pgwaisinp').value);if(!v)return;const d=gDay();d.waist=v;sDay(TODAY,d);document.getElementById('pgwaisinp').value='';render();toast('📏 Талия '+v+' см')}
+function rmFood(i){const d=gDay();d.food=d.food||[];d.food.splice(i,1);sDay(TODAY,d);render();toast('Удалено')}
+function togEx(wd,i){const d=gDay();d.exDone=d.exDone||{};const k=`${wd}_${i}`;d.exDone[k]=!d.exDone[k];sDay(TODAY,d);renderWork();if(d.exDone[k])toast('✅ Упражнение!')}
+function markDone(){const d=gDay();d.workoutDone=true;const exs=WK[vwday]||[];d.exDone=d.exDone||{};exs.forEach((_,i)=>d.exDone[`${vwday}_${i}`]=true);sDay(TODAY,d);renderWork();render();toast('🔥 Тренировка выполнена!')}
+
+// FOOD MODAL
+let selF=null;
+function openFM(food){
+  selF=food;
+  se('fmtit',(food.i||'🍽')+' '+food.n);
+  se('fmmac',food.k+' ккал · Б'+food.p+'г Ж'+food.f+'г У'+food.c+'г на 100г');
+  const dg=food.dg||100;document.getElementById('fmg').value=dg;
+  const pts=document.getElementById('ptrow');pts.innerHTML='';
+  const pl=food.dg?[Math.round(food.dg/2),food.dg,Math.round(food.dg*1.5),food.dg*2]:[50,100,150,200,250,300];
+  pl.forEach(g=>{const btn=document.createElement('div');btn.className='pchip'+(g===dg?' sel':'');btn.textContent=g+'г';btn.onclick=()=>{document.getElementById('fmg').value=g;pts.querySelectorAll('.pchip').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');updCalc()};pts.appendChild(btn)});
+  updCalc();document.getElementById('fmod').classList.add('open');
+}
+function updCalc(){
+  if(!selF)return;const g=parseFloat(document.getElementById('fmg').value)||0;const m=g/100;
+  document.getElementById('fmcalc').innerHTML=`<b>${fmt(selF.k*m)} ккал</b> · Б${(selF.p*m).toFixed(1)}г · Ж${(selF.f*m).toFixed(1)}г · У${(selF.c*m).toFixed(1)}г`;
+}
+function confFood(){
+  if(!selF)return;const g=parseFloat(document.getElementById('fmg').value);if(!g)return;const m=g/100;
+  const d=gDay();d.food=d.food||[];d.food.push({ic:selF.i||'🍽',nm:selF.n+' ('+Math.round(g)+'г)',k:selF.k*m,p:selF.p*m,f:selF.f*m,c:selF.c*m});
+  sDay(TODAY,d);document.getElementById('fmod').classList.remove('open');render();renderLog();toast('✅ '+selF.n);
+}
+function openCF(){document.getElementById('cfmod').classList.add('open')}
+function savCF(){
+  const n=document.getElementById('cfn').value.trim();const k=parseFloat(document.getElementById('cfk').value)||0;
+  const p=parseFloat(document.getElementById('cfp').value)||0;const f=parseFloat(document.getElementById('cff').value)||0;
+  const c=parseFloat(document.getElementById('cfc').value)||0;const g=parseFloat(document.getElementById('cfg').value)||100;
+  if(!n||!k){toast('❌ Заполни название и калории');return}
+  const cf=gCF();cf.push({cat:'Мой',i:'🍽',n,k,p,f,c,custom:true});sCF(cf);
+  const m=g/100;const d=gDay();d.food=d.food||[];
+  d.food.push({ic:'🍽',nm:n+' ('+Math.round(g)+'г)',k:k*m,p:p*m,f:f*m,c:c*m});
+  sDay(TODAY,d);document.getElementById('cfmod').classList.remove('open');
+  ['cfn','cfk','cfp','cff','cfc','cfg'].forEach(id=>document.getElementById(id).value='');
+  render();toast('✅ '+n+' добавлен!');
+}
+
+// NAV
+const TABS2=['dash','food','work','watr','prog'];
+function go(t){
+  TABS2.forEach(tab=>{document.getElementById('t-'+tab).classList.toggle('on',tab===t);document.getElementById('p-'+tab).classList.toggle('on',tab===t)});
+  if(t==='food'){renderFDB();renderLog()}if(t==='work')renderWork();if(t==='prog')renderProg();
+}
+function clov(e,id){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open')}
+
+// TOAST
+let tt=null;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');if(tt)clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2500)}
+
+render();
+</script>
+</body>
+</html>
